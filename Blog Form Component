@@ -1,0 +1,78 @@
+
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createBlog, updateBlog } from '../../services/blog';
+import { useAuth } from '../../context/AuthContext';
+
+interface BlogFormProps {
+  existingBlog?: {
+    _id: string;
+    title: string;
+    content: string;
+  };
+}
+
+export default function BlogForm({ existingBlog }: BlogFormProps) {
+  const [title, setTitle] = useState(existingBlog?.title || '');
+  const [content, setContent] = useState(existingBlog?.content || '');
+  const [error, setError] = useState('');
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!title || !content) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    try {
+      if (existingBlog) {
+        await updateBlog(existingBlog._id, { title, content });
+      } else {
+        await createBlog({ title, content });
+      }
+      navigate('/');
+    } catch (err) {
+      setError('Failed to save blog');
+    }
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">
+        {existingBlog ? 'Edit Blog Post' : 'Create New Blog Post'}
+      </h1>
+      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
+          <input
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+          />
+        </div>
+        <div>
+          <label htmlFor="content" className="block text-sm font-medium text-gray-700">Content</label>
+          <textarea
+            id="content"
+            rows={10}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+          />
+        </div>
+        <button
+          type="submit"
+          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          {existingBlog ? 'Update Post' : 'Publish Post'}
+        </button>
+      </form>
+    </div>
+  );
+}
