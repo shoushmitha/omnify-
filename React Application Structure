@@ -1,0 +1,22 @@
+src/
+├── components/
+│   ├── Auth/
+│   │   ├── Login.tsx
+│   │   └── Register.tsx
+│   ├── Blog/
+│   │   ├── BlogList.tsx
+│   │   ├── BlogDetail.tsx
+│   │   ├── BlogForm.tsx
+│   │   └── BlogItem.tsx
+│   └── Layout/
+│       ├── Navbar.tsx
+│       └── Pagination.tsx
+├── context/
+│   └── AuthContext.tsx
+├── hooks/
+│   └── useAuth.ts
+├── services/
+│   ├── auth.ts
+│   └── blog.ts
+├── App.tsx
+└── index.tsx
