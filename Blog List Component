@@ -1,0 +1,51 @@
+
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import Pagination from '../Layout/Pagination';
+import { getBlogs } from '../../services/blog';
+
+interface Blog {
+  _id: string;
+  title: string;
+  author: { email: string };
+  createdAt: string;
+}
+
+export default function BlogList() {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 5;
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      const data = await getBlogs(currentPage, limit);
+      setBlogs(data.blogs);
+      setTotalPages(data.pages);
+    };
+    fetchBlogs();
+  }, [currentPage]);
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Latest Blog Posts</h1>
+      <div className="space-y-6">
+        {blogs.map(blog => (
+          <div key={blog._id} className="border-b pb-6">
+            <Link to={`/blogs/${blog._id}`} className="text-2xl font-semibold hover:text-blue-600">
+              {blog.title}
+            </Link>
+            <p className="text-gray-600 mt-2">
+              Posted by {blog.author.email} on {new Date(blog.createdAt).toLocaleDateString()}
+            </p>
+          </div>
+        ))}
+      </div>
+      <Pagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+    </div>
+  );
+}
